@@ -1,75 +1,52 @@
 
-# ============================================================
-# app/routes/auth.py
-# PURPOSE: Register and Login endpoints
-# ============================================================
-
-from fastapi import APIRouter, Depends, HTTPException
+from datetime import datetime, timedelta
+from jose import jwt, JWTError
+from passlib.context import CryptContext
+from fastapi import HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
-from app.schemas import UserCreate, UserLogin, UserResponse, TokenResponse
-from app.auth import hash_password, verify_password, create_token,get_current_user
 
-router = APIRouter(prefix="/auth", tags=["Authentication"])
+# ==================== CONFIG ====================
+SECRET_KEY = "creditwise-super-secret-key-change-in-production"
+ALGORITHM = "HS256"
+TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
-# ==================== REGISTER ====================
-@router.post("/register", response_model=TokenResponse)
-def register(user_data: UserCreate, db: Session = Depends(get_db)):
-    # 1. Check if email already exists
-    existing = db.query(User).filter(User.email == user_data.email).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    # 2. Hash the password
-    hashed = hash_password(user_data.password)
-    
-    # 3. Create the user
-    user = User(
-        email=user_data.email,
-        password_hash=hashed,
-        first_name=user_data.first_name,
-        last_name=user_data.last_name
-    )
-    
-    # 4. Save to database
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    
-    # 5. Create token
-    token = create_token(user.id)
-    
-    # 6. Return response
-    return TokenResponse(
-        access_token=token,
-        token_type="bearer",
-        user=UserResponse.model_validate(user)
-    )
+# ==================== PASSWORD HASHING ====================
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# ==================== LOGIN ====================
-@router.post("/login", response_model=TokenResponse)
-def login(credentials: UserLogin, db: Session = Depends(get_db)):
-    # 1. Find user by email
-    user = db.query(User).filter(User.email == credentials.email).first()
+def hash_password(password: str) -> str:
+    """Convert plain password into hash (max 72 bytes for bcrypt)"""
+    return pwd_context.hash(password[:72])
+
+def verify_password(plain: str, hashed: str) -> bool:
+    """Check if plain password matches stored hash"""
+    return pwd_context.verify(plain[:72], hashed)
+
+# ==================== JWT TOKENS ====================
+def create_token(user_id: int) -> str:
+    """Create JWT token for a user"""
+    expire = datetime.utcnow() + timedelta(minutes=TOKEN_EXPIRE_MINUTES)
+    payload = {"sub": str(user_id), "exp": expire}
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+# ==================== GET CURRENT USER ====================
+security = HTTPBearer()
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+) -> User:
+    """Get the logged-in user from JWT token"""
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = int(payload.get("sub"))
+    except (JWTError, ValueError, TypeError):
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    # 2. Verify password
-    if not verify_password(credentials.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    # 3. Create token
-    token = create_token(user.id)
-    
-    # 4. Return response
-    return TokenResponse(
-        access_token=token,
-        token_type="bearer",
-        user=UserResponse.model_validate(user)
-    )
-
-# ==================== GET ME ====================
-@router.get("/me", response_model=UserResponse)
-def get_me(current_user: User = Depends(get_current_user)):
-    return current_user
+        raise HTTPException(status_code=401, detail="User not found")
+    return user

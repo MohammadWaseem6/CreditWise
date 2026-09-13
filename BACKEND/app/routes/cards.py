@@ -5,7 +5,7 @@ from typing import List
 from app.database import get_db
 from app.models import CreditCard, UserBadge
 from app.schemas import CreditCardCreate, CreditCardResponse
-from app.auth import get_current_user
+from app.auth import get_current_user   
 
 router = APIRouter(prefix="/cards", tags=["cards"])
 

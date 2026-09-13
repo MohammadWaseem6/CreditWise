@@ -1,16 +1,13 @@
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
-from app.routes import auth, cards, payments, dashboard
+from app.routes import auth, cards
 
-# Create tables
-print(" Creating database tables...")
 Base.metadata.create_all(bind=engine)
-print("Tables created successfully!")
 
-app = FastAPI(title="CreditWise API", version="1.0.0")
+app = FastAPI(title="CreditWise API")
 
-# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,16 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include all routes
 app.include_router(auth.router)
 app.include_router(cards.router)
-app.include_router(payments.router)
-app.include_router(dashboard.router)
 
 @app.get("/")
 def home():
-    return {"message": "Welcome to CreditWise API! 🚀"}
-
-@app.get("/health")
-def health():
-    return {"status": "healthy", "database": "PostgreSQL"}
+    return {"message": "CreditWise API is running! "}
