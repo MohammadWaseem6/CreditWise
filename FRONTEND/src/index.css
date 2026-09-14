@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #6C3CE1;
+  --color-secondary: #E83E8C;
+  --color-accent: #00D4FF;
+  --color-darkBg: #0B0F19;
+  --color-lightBg: #F8F9FE;
+}
+
+@layer base {
+  * {
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  }
+  
+  body {
+    background-color: var(--color-lightBg);
+    color: #111827;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+  }
+  
+  .dark body {
+    background-color: var(--color-darkBg);
+    color: white;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    border-radius: 1rem;
+  }
+  
+  .dark .glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .gradient-text {
+    background: linear-gradient(135deg, #6C3CE1 0%, #E83E8C 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  .btn-primary {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, #6C3CE1 0%, #E83E8C 100%);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  
+  .input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid #e5e7eb;
+    outline: none;
+    transition: all 0.2s;
+    color: #111827;
+  }
+  
+  .input-field:focus {
+    border-color: #6C3CE1;
+    box-shadow: 0 0 0 3px rgba(108, 60, 225, 0.2);
+  }
+  
+  .dark .input-field {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+  
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #6C3CE1 0%, #E83E8C 100%);
+  }
+}

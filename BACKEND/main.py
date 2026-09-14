@@ -1,6 +1,6 @@
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI # pyright: ignore[reportMissingImports]
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
 from app.database import engine, Base
 from app.routes import auth, cards
 
@@ -21,4 +21,4 @@ app.include_router(cards.router)
 
 @app.get("/")
 def home():
-    return {"message": "CreditWise API is running! "}
+    return {"message": "CreditWise API is running!"}
