@@ -16,7 +16,7 @@ TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours = 60 min × 24
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")  # Create bcrypt password hasher
 
 def hash_password(password: str) -> str:  # Takes plain password, returns hash
-    """Convert plain password into hash (max 72 bytes for bcrypt)"""
+    """Convert plain password into hash (max 72 bytes for bcrypt)""" 
     return pwd_context.hash(password[:72])  # Truncate to 72 bytes (bcrypt limit), then hash
 
 def verify_password(plain: str, hashed: str) -> bool:  # Takes plain + hash, returns True/False

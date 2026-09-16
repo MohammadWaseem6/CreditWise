@@ -1,3 +1,7 @@
-cd ~/Desktop/CreditWise/BACKEND
-source venv/bin/activate
-uvicorn main:app --reload --port 8000
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-dotenv
+pydantic
+numpy
+pandas
