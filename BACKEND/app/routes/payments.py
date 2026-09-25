@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import CreditCard, Payment, UserBadge
 from app.schemas import PaymentCreate
-from BACKEND.app.routes.auth import get_current_user
+from app.routes.auth import get_current_user
 import math
 
 router = APIRouter(prefix="/payments", tags=["payments"])
