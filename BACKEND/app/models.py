@@ -61,6 +61,8 @@ class CreditCard(Base):
     current_balance = Column(Float, default=0)
     apr = Column(Float)
     due_day = Column(Integer)
+    expiry_month = Column(Integer, nullable=True)
+    expiry_year = Column(Integer, nullable=True)
     rewards_percent = Column(Float, default=0)
 
     # is active

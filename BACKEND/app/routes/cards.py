@@ -30,7 +30,9 @@ def create_card(
         credit_limit=card_data.credit_limit,
         current_balance=card_data.current_balance,
         apr=card_data.apr,
-        due_day=card_data.due_day
+        due_day=card_data.due_day,
+        expiry_month=card_data.expiry_month,   
+        expiry_year=card_data.expiry_year,
     )
     db.add(new_card)
     db.commit()

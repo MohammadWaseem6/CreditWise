@@ -43,6 +43,8 @@ class CreditCardCreate(BaseModel):
     current_balance: Optional[float] = 0
     apr: float
     due_day: int
+    expiry_month: Optional[int] = None
+    expiry_year: Optional[int] = None
 
 
 # CREDIT CARD RESPONSE - What API Returns
