@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Cards from './pages/Cards';
+import Badges from './pages/Badges';
 
 function App() {
   return (
@@ -21,7 +22,8 @@ function App() {
             <Route element={<Layout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/cards" element={<Cards />} />
-              <Route path="/" element={<Navigate to="/dashboard" />} />
+              <Route path="/badges" element={<Badges />} />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>
           </Route>
         </Routes>

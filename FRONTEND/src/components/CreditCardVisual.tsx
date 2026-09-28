@@ -1,7 +1,6 @@
- ============================================================
 
 import { useRef, useState } from 'react';
-import type { CreditCard } from '../types';
+import type { CreditCard } from '../types/types';
 import { Wifi, Eye, EyeOff } from 'lucide-react';
 
 interface Props {

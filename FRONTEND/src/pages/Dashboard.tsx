@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import { CreditCard, TrendingUp, Award, DollarSign } from 'lucide-react';
-import type { DashboardData } from '../types';
+import type { DashboardData } from '../types/types';
 
 export default function Dashboard() {
   const { user } = useAuth();

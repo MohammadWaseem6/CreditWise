@@ -2,7 +2,7 @@
 from fastapi import FastAPI # pyright: ignore[reportMissingImports]
 from fastapi.middleware.cors import CORSMiddleware # type: ignore
 from app.database import engine, Base
-from app.routes import auth, cards,payments,dashboard
+from app.routes import auth, cards,payments,dashboard,badges
 
 Base.metadata.create_all(bind=engine)
 
@@ -20,6 +20,8 @@ app.include_router(auth.router)
 app.include_router(cards.router)
 app.include_router(payments.router)      # ← NEW
 app.include_router(dashboard.router)     # ← NEW
+app.include_router(badges.router)   # ← ADDED!
+
 
 
 @app.get("/")
