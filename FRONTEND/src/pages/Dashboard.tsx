@@ -1,22 +1,36 @@
-// ============================================================
-// src/pages/Dashboard.jsx
-// PURPOSE: Main dashboard showing stats, simulator, payments, badges
-// ============================================================
-
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
-import { CreditCard, TrendingUp, Award, DollarSign } from 'lucide-react';
+import {
+  CreditCard, TrendingUp, Award, DollarSign,
+  // Badge icons
+  Send, Flame, Swords, PiggyBank, Star, Crown, PartyPopper, Layers,
+} from 'lucide-react';
 import type { DashboardData } from '../types/types';
+
+// Icon name → Lucide component map
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  CreditCard,
+  Send,
+  Flame,
+  Swords,
+  PiggyBank,
+  Star,
+  Crown,
+  PartyPopper,
+  TrendingUp,
+  Layers,
+};
+
+function getIcon(name: string) {
+  return ICON_MAP[name] || Award;
+}
 
 export default function Dashboard() {
   const { user } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // ============================================================
-  // FETCH DASHBOARD DATA FROM BACKEND
-  // ============================================================
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
@@ -31,9 +45,6 @@ export default function Dashboard() {
     fetchDashboard();
   }, []);
 
-  // ============================================================
-  // LOADING STATE
-  // ============================================================
   if (loading || !data) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -42,12 +53,9 @@ export default function Dashboard() {
     );
   }
 
-  // ============================================================
-  // MAIN RENDER
-  // ============================================================
   return (
     <div>
-      {/* ============ HEADER ============ */}
+      {/* HEADER */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="text-gray-500 dark:text-gray-400">
@@ -55,9 +63,8 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* ============ STAT CARDS ============ */}
+      {/* STAT CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {/* Total Debt */}
         <div className="glass-card p-6">
           <div className="flex items-center gap-3 mb-2">
             <DollarSign className="h-5 w-5 text-primary" />
@@ -71,7 +78,6 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Available Credit */}
         <div className="glass-card p-6">
           <div className="flex items-center gap-3 mb-2">
             <TrendingUp className="h-5 w-5 text-secondary" />
@@ -87,7 +93,6 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Level */}
         <div className="glass-card p-6">
           <div className="flex items-center gap-3 mb-2">
             <Award className="h-5 w-5 text-accent" />
@@ -99,7 +104,6 @@ export default function Dashboard() {
           <p className="text-xs text-gray-400">{data.xp} XP earned</p>
         </div>
 
-        {/* Cards */}
         <div className="glass-card p-6">
           <div className="flex items-center gap-3 mb-2">
             <CreditCard className="h-5 w-5 text-yellow-500" />
@@ -112,7 +116,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ============ PAYOFF SIMULATOR ============ */}
+      {/* PAYOFF SIMULATOR */}
       {data.payoff_months !== null && data.total_debt > 0 && (
         <div className="glass-card p-6 mb-6">
           <h2 className="text-xl font-bold mb-4">💰 Payoff Simulator</h2>
@@ -138,7 +142,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ============ RECENT PAYMENTS ============ */}
+      {/* RECENT PAYMENTS */}
       <div className="glass-card p-6 mb-6">
         <h2 className="text-xl font-bold mb-4">Recent Payments</h2>
         {data.recent_payments.length === 0 ? (
@@ -172,20 +176,25 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* ============ BADGES ============ */}
+      {/* BADGES - Now with Lucide icons! */}
       {data.badges.length > 0 && (
         <div className="glass-card p-6">
           <h2 className="text-xl font-bold mb-4">🏆 Your Badges</h2>
           <div className="flex flex-wrap gap-3">
-            {data.badges.map((badge, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-primary/10 border border-primary/20"
-              >
-                <span className="text-2xl">{badge.icon}</span>
-                <span className="text-sm font-medium">{badge.name}</span>
-              </div>
-            ))}
+            {data.badges.map((badge, index) => {
+              const Icon = getIcon(badge.icon);
+              return (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20"
+                >
+                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-secondary">
+                    <Icon className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="text-sm font-medium">{badge.name}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

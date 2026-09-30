@@ -38,6 +38,7 @@ class UserResponse(BaseModel):
 # CREDIT CARD CREATE - For Adding a Card
 class CreditCardCreate(BaseModel):
     card_name: str
+    card_number: Optional[str] = None
     last_four: str
     credit_limit: float
     current_balance: Optional[float] = 0
@@ -51,6 +52,7 @@ class CreditCardCreate(BaseModel):
 class CreditCardResponse(BaseModel):
     id: int
     card_name: str
+    card_number: Optional[str] = None
     last_four: str
     credit_limit: float
     current_balance: float

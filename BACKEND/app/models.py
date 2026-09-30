@@ -54,6 +54,7 @@ class CreditCard(Base):
 
     # card information
     card_name = Column(String)
+    card_number = Column(String, nullable=True)
     last_four = Column(String)
 
     # financial info

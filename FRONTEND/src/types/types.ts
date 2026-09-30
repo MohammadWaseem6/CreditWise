@@ -17,6 +17,7 @@ export interface User {
 export interface CreditCard {
     id: number;
     card_name: string;
+    card_number: string | null;     
     last_four: string;
     credit_limit: number;
     current_balance: number;
@@ -85,25 +86,25 @@ export interface PaymentResponse {
 }
 // ---------- BADGES ----------
 export interface EarnedBadge {
-  name: string;
-  icon: string;
-  color: string;
-  description: string;
-  earned_at: string;
+    name: string;
+    icon: string;
+    color: string;
+    description: string;
+    earned_at: string;
 }
 
 export interface AvailableBadge {
-  name: string;
-  icon: string;
-  color: string;
-  description: string;
-  requirement: string;
+    name: string;
+    icon: string;
+    color: string;
+    description: string;
+    requirement: string;
 }
 
 export interface BadgesResponse {
-  earned: EarnedBadge[];
-  available: AvailableBadge[];
-  total_earned: number;
-  total_badges: number;
-  newly_awarded: string[];
+    earned: EarnedBadge[];
+    available: AvailableBadge[];
+    total_earned: number;
+    total_badges: number;
+    newly_awarded: string[];
 }

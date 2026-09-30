@@ -1,4 +1,3 @@
-
 import CreditCardVisual from '../components/CreditCardVisual';
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState, FormEvent, ChangeEvent } from 'react';
@@ -7,9 +6,10 @@ import { Plus, X, CreditCard as CardIcon } from 'lucide-react';
 import type { CreditCard } from '../types';
 import { AxiosError } from 'axios';
 
-// FORM STATE TYPE 
+// ---------- FORM STATE TYPE ----------
 interface CardFormState {
   card_name: string;
+  card_number: string;      // ← NEW
   last_four: string;
   credit_limit: string;
   current_balance: string;
@@ -19,16 +19,15 @@ interface CardFormState {
   expiry_year: string;
 }
 
-// ERROR RESPONSE TYPE
+// ---------- ERROR RESPONSE TYPE ----------
 interface ApiError {
   detail: string;
 }
 
 export default function Cards() {
-// AUTH 
   const { user } = useAuth();
 
-  // STATE
+  // ---------- STATE ----------
   const [cards, setCards] = useState<CreditCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -36,6 +35,7 @@ export default function Cards() {
 
   const [form, setForm] = useState<CardFormState>({
     card_name: '',
+    card_number: '',          // ← NEW
     last_four: '',
     credit_limit: '',
     current_balance: '',
@@ -45,9 +45,7 @@ export default function Cards() {
     expiry_year: '',
   });
 
-
-  // FETCH CARDS ON MOUNT
-  
+  // ---------- FETCH CARDS ----------
   useEffect(() => {
     fetchCards();
   }, []);
@@ -63,16 +61,12 @@ export default function Cards() {
     }
   };
 
-  
-  // HANDLE FORM CHANGE
- 
+  // ---------- HANDLE FORM CHANGE ----------
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
- 
-  // HANDLE FORM SUBMIT
-  
+  // ---------- HANDLE FORM SUBMIT ----------
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError('');
@@ -80,6 +74,7 @@ export default function Cards() {
     try {
       const res = await api.post<CreditCard>('/cards/', {
         card_name: form.card_name,
+        card_number: form.card_number || null,   // ← NEW
         last_four: form.last_four,
         credit_limit: parseFloat(form.credit_limit),
         current_balance: parseFloat(form.current_balance || '0'),
@@ -94,6 +89,7 @@ export default function Cards() {
       // Reset form
       setForm({
         card_name: '',
+        card_number: '',          // ← NEW
         last_four: '',
         credit_limit: '',
         current_balance: '',
@@ -109,8 +105,7 @@ export default function Cards() {
     }
   };
 
-
-  //loading
+  // ---------- LOADING ----------
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -119,10 +114,10 @@ export default function Cards() {
     );
   }
 
-//   main render
+  // ---------- MAIN RENDER ----------
   return (
     <div>
-     {/* header */}
+      {/* HEADER */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Cards</h1>
@@ -139,7 +134,7 @@ export default function Cards() {
         </button>
       </div>
 
-      {/*  CARDS GRID  */}
+      {/* CARDS GRID */}
       {cards.length === 0 ? (
         <div className="glass-card p-12 text-center">
           <CardIcon className="h-16 w-16 mx-auto text-gray-300 mb-4" />
@@ -161,7 +156,7 @@ export default function Cards() {
               {/* Realistic card visual */}
               <CreditCardVisual
                 card={card}
-                cardholderName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`}
+                cardholderName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim()}
               />
 
               {/* Card info below */}
@@ -202,7 +197,7 @@ export default function Cards() {
         </div>
       )}
 
-      {/* ============ ADD CARD MODAL ============ */}
+      {/* ADD CARD MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glass-card p-8 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -239,6 +234,33 @@ export default function Cards() {
                   className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
                   required
                 />
+              </div>
+
+              {/* FULL CARD NUMBER */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Full Card Number (16 digits)
+                </label>
+                <input
+                  type="text"
+                  name="card_number"
+                  value={form.card_number}
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/\D/g, '').slice(0, 16);
+                    const lastFour = digits.slice(-4);
+                    setForm({
+                      ...form,
+                      card_number: digits,
+                      last_four: lastFour || form.last_four,
+                    });
+                  }}
+                  placeholder="4242424242424242"
+                  maxLength={16}
+                  className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  ⚠️ For learning only. Never store real card numbers in production!
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

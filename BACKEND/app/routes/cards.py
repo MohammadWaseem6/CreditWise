@@ -26,6 +26,7 @@ def create_card(
     new_card = CreditCard(
         user_id=current_user.id,
         card_name=card_data.card_name,
+        card_number=card_data.card_number,
         last_four=card_data.last_four,
         credit_limit=card_data.credit_limit,
         current_balance=card_data.current_balance,

@@ -18,9 +18,9 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(cards.router)
-app.include_router(payments.router)      # ← NEW
-app.include_router(dashboard.router)     # ← NEW
-app.include_router(badges.router)   # ← ADDED!
+app.include_router(payments.router)     
+app.include_router(dashboard.router)    
+app.include_router(badges.router)   
 
 
 
