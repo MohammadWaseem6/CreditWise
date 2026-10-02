@@ -103,3 +103,12 @@ class DashboardResponse(BaseModel):
     # Payoff simulator
     payoff_months:Optional[int]=None
     total_interest:Optional[int]=None
+
+class UserUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+
+
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str

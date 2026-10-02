@@ -2,8 +2,8 @@ import CreditCardVisual from '../components/CreditCardVisual';
 import LogPaymentModal from '../components/LogPaymentModal';
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState, FormEvent, ChangeEvent } from 'react';
+import { Plus, X, CreditCard as CardIcon, DollarSign, Trash2 } from 'lucide-react';
 import api from '../utils/api';
-import { Plus, X, CreditCard as CardIcon, DollarSign } from 'lucide-react';
 import type { CreditCard } from '../types/types';
 import { AxiosError } from 'axios';
 
@@ -31,6 +31,7 @@ export default function Cards() {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState('');
   const [paymentCard, setPaymentCard] = useState<CreditCard | null>(null);
+  const [deleteCard, setDeleteCard] = useState<CreditCard | null>(null);
 
   const [form, setForm] = useState<CardFormState>({
     card_name: '',
@@ -100,6 +101,16 @@ export default function Cards() {
     }
   };
 
+  const handleDelete = async (card: CreditCard): Promise<void> => {
+    try {
+      await api.delete(`/cards/${card.id}`);
+      setCards(cards.filter((c) => c.id !== card.id));
+      setDeleteCard(null);
+    } catch (err) {
+      console.error('Failed to delete card:', err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -110,7 +121,6 @@ export default function Cards() {
 
   return (
     <div>
-      {/* HEADER */}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Cards</h1>
@@ -127,7 +137,6 @@ export default function Cards() {
         </button>
       </div>
 
-      {/* CARDS GRID */}
       {cards.length === 0 ? (
         <div className="glass-card p-12 text-center">
           <CardIcon className="h-16 w-16 mx-auto text-gray-300 mb-4" />
@@ -151,7 +160,6 @@ export default function Cards() {
                 cardholderName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim()}
               />
 
-              {/* Card info below */}
               <div className="glass-card p-4 rounded-xl">
                 <div className="flex justify-between items-center mb-2">
                   <p className="text-xs text-gray-500">Balance</p>
@@ -184,22 +192,29 @@ export default function Cards() {
                   <span className="text-gray-500">Due: {card.due_day}th</span>
                 </div>
 
-                {/* LOG PAYMENT BUTTON */}
-                <button
-                  onClick={() => setPaymentCard(card)}
-                  disabled={card.current_balance === 0}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <DollarSign className="h-4 w-4" />
-                  {card.current_balance === 0 ? 'Paid Off 🎉' : 'Log Payment'}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPaymentCard(card)}
+                    disabled={card.current_balance === 0}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <DollarSign className="h-4 w-4" />
+                    {card.current_balance === 0 ? 'Paid Off' : 'Log Payment'}
+                  </button>
+                  <button
+                    onClick={() => setDeleteCard(card)}
+                    className="px-4 py-2.5 rounded-xl border border-red-200 dark:border-red-500/30 text-red-500 hover:bg-red-500/10 transition-all"
+                    title="Delete"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* ADD CARD MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glass-card p-8 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -396,13 +411,49 @@ export default function Cards() {
         </div>
       )}
 
-      {/* LOG PAYMENT MODAL */}
       <LogPaymentModal
         card={paymentCard}
         open={!!paymentCard}
         onClose={() => setPaymentCard(null)}
         onSuccess={fetchCards}
       />
+
+      {deleteCard && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="glass-card p-8 rounded-2xl max-w-md w-full">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 rounded-xl bg-red-500/10">
+                <Trash2 className="h-6 w-6 text-red-500" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Delete Card</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+              Are you sure you want to delete <strong>{deleteCard.card_name}</strong> (•••• {deleteCard.last_four})? Your payment history will be preserved.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteCard(null)}
+                className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-white/5 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteCard)}
+                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition-all"
+              >
+                Delete Card
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

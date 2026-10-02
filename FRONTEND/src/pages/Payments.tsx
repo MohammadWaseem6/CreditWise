@@ -53,9 +53,8 @@ export default function Payments() {
 
     const { payments, stats } = data;
 
-    // ============================================================
     // DATE FORMATTER
-    // ============================================================
+
     const formatDate = (iso: string) => {
         const d = new Date(iso);
         return d.toLocaleDateString('en-US', {
@@ -73,9 +72,8 @@ export default function Payments() {
         });
     };
 
-    // ============================================================
-    // MAIN RENDER
-    // ============================================================
+
+    // main render
     return (
         <div>
             {/* HEADER */}
@@ -93,7 +91,7 @@ export default function Payments() {
                 </div>
             </div>
 
-            {/* STATS ROW */}
+            {/* STATS ROW  */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <div className="glass-card p-5">
                     <div className="flex items-center gap-2 mb-2">

@@ -56,3 +56,21 @@ def create_card(
         db.commit()
     
     return new_card
+
+@router.delete("/{card_id}")
+def delete_card(
+    card_id: int,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    card = db.query(CreditCard).filter(
+        CreditCard.id == card_id,
+        CreditCard.user_id == current_user.id,
+    ).first()
+
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found")
+
+    card.is_active = False
+    db.commit()
+    return {"message": "Card deleted successfully"}

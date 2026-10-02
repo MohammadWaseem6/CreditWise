@@ -8,6 +8,8 @@ import Dashboard from './pages/Dashboard';
 import Cards from './pages/Cards';
 import Badges from './pages/Badges';
 import Payments from './pages/Payments';
+import Profile from './pages/Profile';
+
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
               <Route path="/payments" element={<Payments />} />
               <Route path="/badges" element={<Badges />} />
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/profile" element={<Profile />} />
+
             </Route>
           </Route>
         </Routes>
