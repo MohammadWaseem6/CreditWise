@@ -1,15 +1,15 @@
 import CreditCardVisual from '../components/CreditCardVisual';
+import LogPaymentModal from '../components/LogPaymentModal';
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState, FormEvent, ChangeEvent } from 'react';
 import api from '../utils/api';
-import { Plus, X, CreditCard as CardIcon } from 'lucide-react';
-import type { CreditCard } from '../types';
+import { Plus, X, CreditCard as CardIcon, DollarSign } from 'lucide-react';
+import type { CreditCard } from '../types/types';
 import { AxiosError } from 'axios';
 
-// ---------- FORM STATE TYPE ----------
 interface CardFormState {
   card_name: string;
-  card_number: string;      // ← NEW
+  card_number: string;
   last_four: string;
   credit_limit: string;
   current_balance: string;
@@ -19,7 +19,6 @@ interface CardFormState {
   expiry_year: string;
 }
 
-// ---------- ERROR RESPONSE TYPE ----------
 interface ApiError {
   detail: string;
 }
@@ -27,15 +26,15 @@ interface ApiError {
 export default function Cards() {
   const { user } = useAuth();
 
-  // ---------- STATE ----------
   const [cards, setCards] = useState<CreditCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState('');
+  const [paymentCard, setPaymentCard] = useState<CreditCard | null>(null);
 
   const [form, setForm] = useState<CardFormState>({
     card_name: '',
-    card_number: '',          // ← NEW
+    card_number: '',
     last_four: '',
     credit_limit: '',
     current_balance: '',
@@ -45,7 +44,6 @@ export default function Cards() {
     expiry_year: '',
   });
 
-  // ---------- FETCH CARDS ----------
   useEffect(() => {
     fetchCards();
   }, []);
@@ -61,12 +59,10 @@ export default function Cards() {
     }
   };
 
-  // ---------- HANDLE FORM CHANGE ----------
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ---------- HANDLE FORM SUBMIT ----------
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError('');
@@ -74,7 +70,7 @@ export default function Cards() {
     try {
       const res = await api.post<CreditCard>('/cards/', {
         card_name: form.card_name,
-        card_number: form.card_number || null,   // ← NEW
+        card_number: form.card_number || null,
         last_four: form.last_four,
         credit_limit: parseFloat(form.credit_limit),
         current_balance: parseFloat(form.current_balance || '0'),
@@ -86,10 +82,9 @@ export default function Cards() {
 
       setCards([...cards, res.data]);
 
-      // Reset form
       setForm({
         card_name: '',
-        card_number: '',          // ← NEW
+        card_number: '',
         last_four: '',
         credit_limit: '',
         current_balance: '',
@@ -105,7 +100,6 @@ export default function Cards() {
     }
   };
 
-  // ---------- LOADING ----------
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -114,7 +108,6 @@ export default function Cards() {
     );
   }
 
-  // ---------- MAIN RENDER ----------
   return (
     <div>
       {/* HEADER */}
@@ -153,7 +146,6 @@ export default function Cards() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cards.map((card) => (
             <div key={card.id} className="space-y-4">
-              {/* Realistic card visual */}
               <CreditCardVisual
                 card={card}
                 cardholderName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim()}
@@ -180,17 +172,27 @@ export default function Cards() {
                   />
                 </div>
 
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className="flex justify-between text-xs text-gray-500 mb-3">
                   <span>
                     {((card.current_balance / card.credit_limit) * 100).toFixed(0)}% used
                   </span>
                   <span>Limit: ${card.credit_limit.toFixed(2)}</span>
                 </div>
 
-                <div className="flex justify-between mt-3 text-xs">
+                <div className="flex justify-between text-xs mb-4">
                   <span className="text-gray-500">APR: {card.apr}%</span>
                   <span className="text-gray-500">Due: {card.due_day}th</span>
                 </div>
+
+                {/* LOG PAYMENT BUTTON */}
+                <button
+                  onClick={() => setPaymentCard(card)}
+                  disabled={card.current_balance === 0}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-primary text-white text-sm font-medium hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <DollarSign className="h-4 w-4" />
+                  {card.current_balance === 0 ? 'Paid Off 🎉' : 'Log Payment'}
+                </button>
               </div>
             </div>
           ))}
@@ -201,7 +203,6 @@ export default function Cards() {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="glass-card p-8 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            {/* Modal header */}
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">Add New Card</h2>
               <button
@@ -212,14 +213,12 @@ export default function Cards() {
               </button>
             </div>
 
-            {/* Error */}
             {error && (
               <div className="p-3 mb-4 rounded-xl bg-red-500/10 text-red-500 text-sm">
                 {error}
               </div>
             )}
 
-            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -236,7 +235,6 @@ export default function Cards() {
                 />
               </div>
 
-              {/* FULL CARD NUMBER */}
               <div>
                 <label className="block text-sm font-medium mb-2">
                   Full Card Number (16 digits)
@@ -397,6 +395,14 @@ export default function Cards() {
           </div>
         </div>
       )}
+
+      {/* LOG PAYMENT MODAL */}
+      <LogPaymentModal
+        card={paymentCard}
+        open={!!paymentCard}
+        onClose={() => setPaymentCard(null)}
+        onSuccess={fetchCards}
+      />
     </div>
   );
 }

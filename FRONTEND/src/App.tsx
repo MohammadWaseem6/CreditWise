@@ -7,21 +7,21 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Cards from './pages/Cards';
 import Badges from './pages/Badges';
+import Payments from './pages/Payments';
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected routes */}
           <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/cards" element={<Cards />} />
+              <Route path="/payments" element={<Payments />} />
               <Route path="/badges" element={<Badges />} />
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>

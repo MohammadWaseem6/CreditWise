@@ -108,3 +108,37 @@ export interface BadgesResponse {
     total_badges: number;
     newly_awarded: string[];
 }
+// ---------- PAYMENT ----------
+export interface PaymentData {
+  card_id: number;
+  amount: number;
+}
+
+export interface PaymentResponse {
+  message: string;
+  xp_earned: number;
+  new_balance: number;
+  level: number;
+}
+// ---------- PAYMENTS HISTORY ----------
+export interface PaymentItem {
+  id: number;
+  amount: number;
+  date: string;
+  xp_earned: number;
+  card_id: number;
+  card_name: string;
+  last_four: string;
+}
+
+export interface PaymentStats {
+  total_paid: number;
+  total_count: number;
+  total_xp: number;
+  avg_payment: number;
+}
+
+export interface PaymentsHistoryResponse {
+  payments: PaymentItem[];
+  stats: PaymentStats;
+}

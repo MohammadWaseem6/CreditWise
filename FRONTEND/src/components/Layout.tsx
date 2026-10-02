@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, CreditCard, Trophy, LogOut, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Trophy, LogOut, Sun, Moon, Receipt } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function Layout() {
@@ -27,6 +27,7 @@ export default function Layout() {
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: CreditCard, label: 'Cards', path: '/cards' },
+    { icon: Receipt, label: 'Payments', path: '/payments' },
     { icon: Trophy, label: 'Badges', path: '/badges' },
   ];
 

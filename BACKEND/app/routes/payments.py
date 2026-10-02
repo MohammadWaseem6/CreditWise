@@ -58,3 +58,53 @@ def log_payment(
         "new_balance": card.current_balance,
         "level": current_user.level
     }
+# GET ALL PAYMENTS
+
+@router.get("/")
+def get_payments(
+    card_id: int = None,
+    limit: int = 100,
+    current_user = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all payments for the current user.
+    Optional query param: card_id (filter by card)
+    """
+    query = db.query(Payment).filter(Payment.user_id == current_user.id)
+
+    if card_id:
+        query = query.filter(Payment.card_id == card_id)
+
+    payments = query.order_by(Payment.date.desc()).limit(limit).all()
+
+    # Calculate stats
+    all_payments = db.query(Payment).filter(
+        Payment.user_id == current_user.id
+    ).all()
+
+    total_paid = sum(p.amount for p in all_payments)
+    total_count = len(all_payments)
+    total_xp = sum(p.xp_earned for p in all_payments)
+    avg_payment = total_paid / total_count if total_count > 0 else 0
+
+    return {
+        "payments": [
+            {
+                "id": p.id,
+                "amount": p.amount,
+                "date": p.date.isoformat(),
+                "xp_earned": p.xp_earned,
+                "card_id": p.card_id,
+                "card_name": p.card.card_name if p.card else "Unknown",
+                "last_four": p.card.last_four if p.card else "----",
+            }
+            for p in payments
+        ],
+        "stats": {
+            "total_paid": round(total_paid, 2),
+            "total_count": total_count,
+            "total_xp": total_xp,
+            "avg_payment": round(avg_payment, 2),
+        },
+    }
