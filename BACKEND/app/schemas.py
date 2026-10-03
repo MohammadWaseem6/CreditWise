@@ -38,6 +38,7 @@ class UserResponse(BaseModel):
 # CREDIT CARD CREATE - For Adding a Card
 class CreditCardCreate(BaseModel):
     card_name: str
+    cardholder_name: Optional[str] = None
     card_number: Optional[str] = None
     last_four: str
     credit_limit: float
@@ -47,11 +48,22 @@ class CreditCardCreate(BaseModel):
     expiry_month: Optional[int] = None
     expiry_year: Optional[int] = None
 
-
+class CreditCardUpdate(BaseModel):
+    card_name: Optional[str] = None
+    cardholder_name: Optional[str] = None
+    card_number: Optional[str] = None
+    last_four: Optional[str] = None
+    credit_limit: Optional[float] = None
+    current_balance: Optional[float] = None
+    apr: Optional[float] = None
+    due_day: Optional[int] = None
+    expiry_month: Optional[int] = None
+    expiry_year: Optional[int] = None
 # CREDIT CARD RESPONSE - What API Returns
 class CreditCardResponse(BaseModel):
     id: int
     card_name: str
+    cardholder_name: Optional[str] = None
     card_number: Optional[str] = None
     last_four: str
     credit_limit: float
@@ -59,10 +71,11 @@ class CreditCardResponse(BaseModel):
     apr: float
     due_day: int
     is_active: bool
+    expiry_month: Optional[int] = None
+    expiry_year: Optional[int] = None
 
     class Config:
-        from_attributes = True  
-
+        from_attributes = True
 # TOKEN RESPONSE - For Login/Register
 class TokenResponse(BaseModel):
     access_token:str

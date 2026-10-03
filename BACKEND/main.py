@@ -2,8 +2,7 @@
 from fastapi import FastAPI # pyright: ignore[reportMissingImports]
 from fastapi.middleware.cors import CORSMiddleware # type: ignore
 from app.database import engine, Base
-from app.routes import auth, cards,payments,dashboard,badges,simulator
-
+from app.routes import auth, cards,payments,dashboard,badges,simulator,leaderboard,charts
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="CreditWise API")
@@ -22,6 +21,10 @@ app.include_router(payments.router)
 app.include_router(dashboard.router)    
 app.include_router(badges.router)  
 app.include_router(simulator.router)
+app.include_router(leaderboard.router)
+app.include_router(charts.router)
+
+
  
 
 

@@ -10,6 +10,10 @@ import Badges from './pages/Badges';
 import Payments from './pages/Payments';
 import Profile from './pages/Profile';
 import Simulator from './pages/Simulator';
+import Leaderboard from './pages/Leaderboard';
+import Charts from './pages/Charts';
+
+
 
 
 
@@ -30,6 +34,10 @@ function App() {
                             <Route path="/" element={<Navigate to="/dashboard" replace />} />
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/simulator" element={<Simulator />} />
+                            <Route path="/leaderboard" element={<Leaderboard />} />
+                            <Route path="/charts" element={<Charts />} />
+
+
                         </Route>
                     </Route>
                 </Routes>

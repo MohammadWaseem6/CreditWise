@@ -181,3 +181,48 @@ export interface SimulatorResponse {
   minimum_scenario: MinimumScenario | null;
   savings: number;
 }
+export interface LeaderboardUser {
+  rank: number;
+  id: number;
+  first_name: string;
+  last_name: string;
+  initials: string;
+  xp: number;
+  level: number;
+  is_current_user: boolean;
+}
+
+export interface LeaderboardResponse {
+  top_users: LeaderboardUser[];
+  current_user: LeaderboardUser | null;
+  current_rank: number | null;
+  total_users: number;
+}
+export interface MonthlyPayment {
+  month: string;
+  amount: number;
+  count: number;
+}
+
+export interface CardDistribution {
+  name: string;
+  last_four: string;
+  balance: number;
+  limit: number;
+}
+
+export interface DebtTrendPoint {
+  date: string;
+  debt: number;
+}
+
+export interface ChartsResponse {
+  monthly_payments: MonthlyPayment[];
+  card_distribution: CardDistribution[];
+  debt_trend: DebtTrendPoint[];
+  totals: {
+    total_debt: number;
+    total_paid: number;
+    payment_count: number;
+  };
+}
