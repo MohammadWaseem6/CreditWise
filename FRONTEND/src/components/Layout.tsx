@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, CreditCard, Trophy, LogOut, Sun, Moon, Receipt, User } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Trophy, LogOut, Sun, Moon, Receipt, User, Calculator } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function Layout() {
@@ -24,13 +24,14 @@ export default function Layout() {
     navigate('/login');
   };
 
-  const navItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { icon: CreditCard, label: 'Cards', path: '/cards' },
-    { icon: Receipt, label: 'Payments', path: '/payments' },
-    { icon: Trophy, label: 'Badges', path: '/badges' },
-    { icon: User, label: 'Profile', path: '/profile' },
-  ];
+const navItems = [
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+  { icon: CreditCard, label: 'Cards', path: '/cards' },
+  { icon: Receipt, label: 'Payments', path: '/payments' },
+  { icon: Calculator, label: 'Simulator', path: '/simulator' },
+  { icon: Trophy, label: 'Badges', path: '/badges' },
+  { icon: User, label: 'Profile', path: '/profile' },
+];
 
   return (
     <div className="flex min-h-screen">

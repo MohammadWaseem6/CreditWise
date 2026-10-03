@@ -152,3 +152,32 @@ export interface PasswordChangeData {
   current_password: string;
   new_password: string;
 }
+export interface CardSimulation {
+  card_name: string;
+  last_four: string;
+  balance: number;
+  apr: number;
+  payment: number;
+  months: number | null;
+  interest: number | null;
+  paid: number | null;
+}
+
+export interface MinimumScenario {
+  payment: number;
+  months: number;
+  interest: number;
+  paid: number;
+}
+
+export interface SimulatorResponse {
+  total_debt: number;
+  cards: CardSimulation[];
+  total_months: number;
+  total_interest: number;
+  total_paid: number;
+  payoff_date: string | null;
+  minimum_payment: number;
+  minimum_scenario: MinimumScenario | null;
+  savings: number;
+}

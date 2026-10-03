@@ -9,31 +9,33 @@ import Cards from './pages/Cards';
 import Badges from './pages/Badges';
 import Payments from './pages/Payments';
 import Profile from './pages/Profile';
+import Simulator from './pages/Simulator';
+
 
 
 function App() {
-  return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+    return (
+        <AuthProvider>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
 
-          <Route element={<PrivateRoute />}>
-            <Route element={<Layout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/cards" element={<Cards />} />
-              <Route path="/payments" element={<Payments />} />
-              <Route path="/badges" element={<Badges />} />
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/profile" element={<Profile />} />
-
-            </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
-  );
+                    <Route element={<PrivateRoute />}>
+                        <Route element={<Layout />}>
+                            <Route path="/dashboard" element={<Dashboard />} />
+                            <Route path="/cards" element={<Cards />} />
+                            <Route path="/payments" element={<Payments />} />
+                            <Route path="/badges" element={<Badges />} />
+                            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                            <Route path="/profile" element={<Profile />} />
+                            <Route path="/simulator" element={<Simulator />} />
+                        </Route>
+                    </Route>
+                </Routes>
+            </BrowserRouter>
+        </AuthProvider>
+    );
 }
 
 export default App;
