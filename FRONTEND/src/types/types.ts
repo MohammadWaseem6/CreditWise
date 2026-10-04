@@ -1,7 +1,3 @@
-// ============================================================
-// src/types.ts
-// PURPOSE: Shared TypeScript types for CreditWise
-// ============================================================
 
 // ---------- USER ----------
 export interface User {
@@ -79,10 +75,10 @@ export interface PaymentData {
 }
 
 export interface PaymentResponse {
-    message: string;
-    xp_earned: number;
-    new_balance: number;
-    level: number;
+  message: string;
+  xp_earned: number;
+  new_balance: number;
+  level: number;
 }
 // ---------- BADGES ----------
 export interface EarnedBadge {

@@ -1,49 +1,22 @@
 import CreditCardVisual from '../components/CreditCardVisual';
 import LogPaymentModal from '../components/LogPaymentModal';
+import CardFormModal from '../components/CardFormModal';
 import { useAuth } from '../context/AuthContext';
-import { useEffect, useState, FormEvent, ChangeEvent } from 'react';
-import { Plus, X, CreditCard as CardIcon, DollarSign, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Plus, CreditCard as CardIcon, DollarSign, Trash2, Pencil } from 'lucide-react';
 import api from '../utils/api';
 import type { CreditCard } from '../types/types';
-import { AxiosError } from 'axios';
-
-interface CardFormState {
-  card_name: string;
-  card_number: string;
-  last_four: string;
-  credit_limit: string;
-  current_balance: string;
-  apr: string;
-  due_day: string;
-  expiry_month: string;
-  expiry_year: string;
-}
-
-interface ApiError {
-  detail: string;
-}
+import toast from 'react-hot-toast';
 
 export default function Cards() {
   const { user } = useAuth();
 
   const [cards, setCards] = useState<CreditCard[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [error, setError] = useState('');
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [editingCard, setEditingCard] = useState<CreditCard | null>(null);
   const [paymentCard, setPaymentCard] = useState<CreditCard | null>(null);
   const [deleteCard, setDeleteCard] = useState<CreditCard | null>(null);
-
-  const [form, setForm] = useState<CardFormState>({
-    card_name: '',
-    card_number: '',
-    last_four: '',
-    credit_limit: '',
-    current_balance: '',
-    apr: '',
-    due_day: '',
-    expiry_month: '',
-    expiry_year: '',
-  });
 
   useEffect(() => {
     fetchCards();
@@ -60,45 +33,14 @@ export default function Cards() {
     }
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const openAddModal = () => {
+    setEditingCard(null);
+    setShowFormModal(true);
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    setError('');
-
-    try {
-      const res = await api.post<CreditCard>('/cards/', {
-        card_name: form.card_name,
-        card_number: form.card_number || null,
-        last_four: form.last_four,
-        credit_limit: parseFloat(form.credit_limit),
-        current_balance: parseFloat(form.current_balance || '0'),
-        apr: parseFloat(form.apr),
-        due_day: parseInt(form.due_day),
-        expiry_month: form.expiry_month ? parseInt(form.expiry_month) : null,
-        expiry_year: form.expiry_year ? parseInt(form.expiry_year) : null,
-      });
-
-      setCards([...cards, res.data]);
-
-      setForm({
-        card_name: '',
-        card_number: '',
-        last_four: '',
-        credit_limit: '',
-        current_balance: '',
-        apr: '',
-        due_day: '',
-        expiry_month: '',
-        expiry_year: '',
-      });
-      setShowModal(false);
-    } catch (err) {
-      const axiosErr = err as AxiosError<ApiError>;
-      setError(axiosErr.response?.data?.detail || 'Failed to add card');
-    }
+  const openEditModal = (card: CreditCard) => {
+    setEditingCard(card);
+    setShowFormModal(true);
   };
 
   const handleDelete = async (card: CreditCard): Promise<void> => {
@@ -106,8 +48,10 @@ export default function Cards() {
       await api.delete(`/cards/${card.id}`);
       setCards(cards.filter((c) => c.id !== card.id));
       setDeleteCard(null);
+      toast.success('Card deleted successfully');
     } catch (err) {
       console.error('Failed to delete card:', err);
+      toast.error('Failed to delete card');
     }
   };
 
@@ -121,16 +65,16 @@ export default function Cards() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 md:mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Cards</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">Cards</h1>
           <p className="text-gray-500 dark:text-gray-400">
             Manage your credit cards
           </p>
         </div>
         <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-primary text-white hover:opacity-90 transition-all"
+          onClick={openAddModal}
+          className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gradient-primary text-white hover:opacity-90 transition-all"
         >
           <Plus className="h-4 w-4" />
           Add Card
@@ -138,27 +82,36 @@ export default function Cards() {
       </div>
 
       {cards.length === 0 ? (
-        <div className="glass-card p-12 text-center">
+        <div className="glass-card p-8 md:p-12 text-center">
           <CardIcon className="h-16 w-16 mx-auto text-gray-300 mb-4" />
           <h3 className="text-xl font-bold mb-2">No cards yet</h3>
           <p className="text-gray-500 dark:text-gray-400 mb-6">
             Add your first credit card to get started
           </p>
           <button
-            onClick={() => setShowModal(true)}
+            onClick={openAddModal}
             className="px-6 py-3 rounded-xl bg-gradient-primary text-white hover:opacity-90 transition-all"
           >
             + Add Your First Card
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {cards.map((card) => (
             <div key={card.id} className="space-y-4">
-              <CreditCardVisual
-                card={card}
-                cardholderName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim()}
-              />
+              <div className="relative group">
+                <CreditCardVisual
+                  card={card}
+                  cardholderName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim()}
+                />
+                <button
+                  onClick={() => openEditModal(card)}
+                  className="absolute top-3 right-3 p-2 rounded-xl bg-white/20 backdrop-blur-md text-white opacity-0 group-hover:opacity-100 hover:bg-white/30 transition-all"
+                  title="Edit card"
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+              </div>
 
               <div className="glass-card p-4 rounded-xl">
                 <div className="flex justify-between items-center mb-2">
@@ -202,8 +155,15 @@ export default function Cards() {
                     {card.current_balance === 0 ? 'Paid Off' : 'Log Payment'}
                   </button>
                   <button
+                    onClick={() => openEditModal(card)}
+                    className="px-3 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-white/5 transition-all"
+                    title="Edit"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                  <button
                     onClick={() => setDeleteCard(card)}
-                    className="px-4 py-2.5 rounded-xl border border-red-200 dark:border-red-500/30 text-red-500 hover:bg-red-500/10 transition-all"
+                    className="px-3 py-2.5 rounded-xl border border-red-200 dark:border-red-500/30 text-red-500 hover:bg-red-500/10 transition-all"
                     title="Delete"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -215,201 +175,12 @@ export default function Cards() {
         </div>
       )}
 
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="glass-card p-8 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Add New Card</h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-2 rounded-lg hover:bg-white/10"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {error && (
-              <div className="p-3 mb-4 rounded-xl bg-red-500/10 text-red-500 text-sm">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Card Name
-                </label>
-                <input
-                  type="text"
-                  name="card_name"
-                  value={form.card_name}
-                  onChange={handleChange}
-                  placeholder="Chase Sapphire"
-                  className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Full Card Number (16 digits)
-                </label>
-                <input
-                  type="text"
-                  name="card_number"
-                  value={form.card_number}
-                  onChange={(e) => {
-                    const digits = e.target.value.replace(/\D/g, '').slice(0, 16);
-                    const lastFour = digits.slice(-4);
-                    setForm({
-                      ...form,
-                      card_number: digits,
-                      last_four: lastFour || form.last_four,
-                    });
-                  }}
-                  placeholder="4242424242424242"
-                  maxLength={16}
-                  className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  ⚠️ For learning only. Never store real card numbers in production!
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Last 4 Digits
-                  </label>
-                  <input
-                    type="text"
-                    name="last_four"
-                    value={form.last_four}
-                    onChange={handleChange}
-                    placeholder="1234"
-                    maxLength={4}
-                    className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    APR (%)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="apr"
-                    value={form.apr}
-                    onChange={handleChange}
-                    placeholder="22.99"
-                    className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Expiry Month
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="12"
-                    name="expiry_month"
-                    value={form.expiry_month}
-                    onChange={handleChange}
-                    placeholder="12"
-                    className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Expiry Year
-                  </label>
-                  <input
-                    type="number"
-                    min="2024"
-                    max="2050"
-                    name="expiry_year"
-                    value={form.expiry_year}
-                    onChange={handleChange}
-                    placeholder="2028"
-                    className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Credit Limit ($)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="credit_limit"
-                    value={form.credit_limit}
-                    onChange={handleChange}
-                    placeholder="5000"
-                    className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Current Balance ($)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="current_balance"
-                    value={form.current_balance}
-                    onChange={handleChange}
-                    placeholder="0"
-                    className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Due Day (1-31)
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="31"
-                  name="due_day"
-                  value={form.due_day}
-                  onChange={handleChange}
-                  placeholder="15"
-                  className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-                  required
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-white/5"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 rounded-xl bg-gradient-primary text-white hover:opacity-90"
-                >
-                  Add Card
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CardFormModal
+        open={showFormModal}
+        onClose={() => setShowFormModal(false)}
+        onSuccess={fetchCards}
+        existingCard={editingCard}
+      />
 
       <LogPaymentModal
         card={paymentCard}
@@ -420,7 +191,7 @@ export default function Cards() {
 
       {deleteCard && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="glass-card p-8 rounded-2xl max-w-md w-full">
+          <div className="glass-card p-6 md:p-8 rounded-2xl max-w-md w-full">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-3 rounded-xl bg-red-500/10">
                 <Trash2 className="h-6 w-6 text-red-500" />

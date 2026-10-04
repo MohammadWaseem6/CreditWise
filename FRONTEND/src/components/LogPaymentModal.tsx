@@ -1,9 +1,9 @@
-
 import { useState, FormEvent, ChangeEvent } from 'react';
 import api from '../utils/api';
 import { X, DollarSign, Sparkles } from 'lucide-react';
 import type { CreditCard } from '../types/types';
 import { AxiosError } from 'axios';
+import toast from 'react-hot-toast';
 
 interface Props {
     card: CreditCard | null;
@@ -14,6 +14,13 @@ interface Props {
 
 interface ApiError {
     detail: string;
+}
+
+interface PaymentResponse {
+    message: string;
+    xp_earned: number;
+    new_balance: number;
+    level: number;
 }
 
 export default function LogPaymentModal({ card, open, onClose, onSuccess }: Props) {
@@ -33,27 +40,31 @@ export default function LogPaymentModal({ card, open, onClose, onSuccess }: Prop
 
         if (amountNum <= 0) {
             setError('Amount must be greater than 0');
+            toast.error('Amount must be greater than 0');
             return;
         }
 
         if (amountNum > card.current_balance) {
             setError('Payment exceeds current balance');
+            toast.error('Payment exceeds current balance');
             return;
         }
 
         setLoading(true);
         try {
-            await api.post('/payments/', {
+            const res = await api.post<PaymentResponse>('/payments/', {
                 card_id: card.id,
                 amount: amountNum,
             });
-
             setAmount('');
             onSuccess();
             onClose();
+            toast.success(`Payment logged! +${res.data.xp_earned} XP');
         } catch (err) {
             const axiosErr = err as AxiosError<ApiError>;
-            setError(axiosErr.response ?.data ?.detail || 'Failed to log payment');
+            const msg = axiosErr.response ?.data ?.detail || 'Failed to log payment';
+            setError(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
@@ -69,10 +80,10 @@ export default function LogPaymentModal({ card, open, onClose, onSuccess }: Prop
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="glass-card p-8 rounded-2xl max-w-md w-full">
+            <div className="glass-card p-6 md:p-8 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
                     <div>
-                        <h2 className="text-2xl font-bold">Log Payment</h2>
+                        <h2 className="text-xl md:text-2xl font-bold">Log Payment</h2>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             {card.card_name} •••• {card.last_four}
                         </p>
@@ -88,8 +99,8 @@ export default function LogPaymentModal({ card, open, onClose, onSuccess }: Prop
                 <div className="mb-6 p-4 rounded-xl bg-primary/5 border border-primary/10">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                         Current Balance
-          </p>
-                    <p className="text-3xl font-bold text-primary">
+                    </p>
+                    <p className="text-2xl md:text-3xl font-bold text-primary">
                         ${card.current_balance.toFixed(2)}
                     </p>
                 </div>
@@ -104,7 +115,7 @@ export default function LogPaymentModal({ card, open, onClose, onSuccess }: Prop
                     <div>
                         <label className="block text-sm font-medium mb-2">
                             Payment Amount ($)
-            </label>
+                        </label>
                         <div className="relative">
                             <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <input
@@ -122,7 +133,7 @@ export default function LogPaymentModal({ card, open, onClose, onSuccess }: Prop
                                 required
                             />
                         </div>
-                        <div className="flex gap-2 mt-2">
+                        <div className="flex flex-wrap gap-2 mt-2">
                             {[50, 100, 200].map((preset) => (
                                 <button
                                     key={preset}
@@ -140,7 +151,7 @@ export default function LogPaymentModal({ card, open, onClose, onSuccess }: Prop
                                 className="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-all"
                             >
                                 Pay Full
-              </button>
+                            </button>
                         </div>
                     </div>
 
@@ -149,7 +160,7 @@ export default function LogPaymentModal({ card, open, onClose, onSuccess }: Prop
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-gray-600 dark:text-gray-400">
                                     New Balance
-                </span>
+                                </span>
                                 <span className="font-bold">
                                     ${newBalance.toFixed(2)}
                                 </span>
@@ -158,10 +169,10 @@ export default function LogPaymentModal({ card, open, onClose, onSuccess }: Prop
                                 <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
                                     <Sparkles className="h-3.5 w-3.5 text-amber-500" />
                                     You'll earn
-                </span>
+                                </span>
                                 <span className="font-bold text-amber-500">
                                     +{xpPreview} XP
-                </span>
+                                </span>
                             </div>
                         </div>
                     )}
@@ -173,7 +184,7 @@ export default function LogPaymentModal({ card, open, onClose, onSuccess }: Prop
                             className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-white/5 font-medium"
                         >
                             Cancel
-            </button>
+                        </button>
                         <button
                             type="submit"
                             disabled={loading || amountNum <= 0 || amountNum > card.current_balance}
