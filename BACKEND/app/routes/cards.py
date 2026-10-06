@@ -47,10 +47,10 @@ def create_card(
     
     if card_count == 1:
         badge = UserBadge(
-            user_id=current_user.id,
-            badge_name="First Card",
-            badge_icon="💳",
-            description="Added your first credit card!"
+    user_id=current_user.id,
+        badge_name="First Card",
+        badge_icon="CreditCard",  
+        description="Added your first credit card!"
         )
         db.add(badge)
         current_user.xp += 20
