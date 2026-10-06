@@ -11,15 +11,18 @@ export interface User {
 
 // ---------- CREDIT CARD ----------
 export interface CreditCard {
-    id: number;
-    card_name: string;
-    card_number: string | null;     
-    last_four: string;
-    credit_limit: number;
-    current_balance: number;
-    apr: number;
-    due_day: number;
-    is_active: boolean;
+  id: number;
+  card_name: string;
+  cardholder_name: string | null;
+  card_number: string | null;
+  last_four: string;
+  credit_limit: number;
+  current_balance: number;
+  apr: number;
+  due_day: number;
+  is_active: boolean;
+  expiry_month: number | null;
+  expiry_year: number | null;
 }
 
 // ---------- AUTH ----------

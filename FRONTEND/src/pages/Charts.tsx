@@ -213,7 +213,7 @@ export default function Charts() {
                             />
                             <Tooltip
                                 {...tooltipStyle}
-                                formatter={(value: number) => [money(value), 'Debt']}
+                              formatter={(value) => [money(Number(value)), 'Debt'] as [string, string]}
                             />
                             <Line
                                 type="monotone"
@@ -265,7 +265,7 @@ export default function Charts() {
                                 <Tooltip
                                     {...tooltipStyle}
                                     cursor={{ fill: 'rgba(232, 62, 140, 0.08)' }}
-                                    formatter={(value: number) => [money(value), 'Paid']}
+                                 formatter={(value) => [money(Number(value)), 'Paid'] as [string, string]}
                                 />
                                 <Bar
                                     dataKey="amount"
@@ -297,7 +297,7 @@ export default function Charts() {
                                         paddingAngle={3}
                                         cornerRadius={6}
                                         stroke="none"
-                                        label={(entry) => `${entry.name}: ${compact(Math.round(entry.balance))}`}
+                                        label={(entry: any) => `${entry.name}: ${compact(Math.round(entry.balance))}`}
                                         labelLine={false}
                                     >
                                         {data.card_distribution.map((_, index) => (
@@ -306,7 +306,7 @@ export default function Charts() {
                                     </Pie>
                                     <Tooltip
                                         {...tooltipStyle}
-                                        formatter={(value: number) => money(value)}
+                                      formatter={(value) => money(Number(value))}
                                     />
                                     <Legend
                                         iconType="circle"

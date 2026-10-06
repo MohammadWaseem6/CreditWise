@@ -59,7 +59,7 @@ export default function LogPaymentModal({ card, open, onClose, onSuccess }: Prop
             setAmount('');
             onSuccess();
             onClose();
-            toast.success(`Payment logged! +${res.data.xp_earned} XP');
+           toast.success('Payment logged! +' + res.data.xp_earned + ' XP');
         } catch (err) {
             const axiosErr = err as AxiosError<ApiError>;
             const msg = axiosErr.response ?.data ?.detail || 'Failed to log payment';
