@@ -102,54 +102,58 @@
 ---
 
 ## 🏗️ Architecture
+## 📁 Project Structure
+
+```
 CreditWise/
-├── 📁 BACKEND/                     FastAPI Backend
-│   ├── 📁 app/
-│   │   ├── 📄 auth.py              JWT + password hashing
-│   │   ├── 📄 database.py          DB connection + session
-│   │   ├── 📄 models.py            SQLAlchemy models
-│   │   ├── 📄 schemas.py           Pydantic schemas
-│   │   └── 📁 routes/
-│   │       ├── 📄 auth.py          Authentication
-│   │       ├── 📄 cards.py         Credit card CRUD
-│   │       ├── 📄 payments.py      Payment logging
-│   │       ├── 📄 dashboard.py     Dashboard summary
-│   │       ├── 📄 badges.py        Achievements
-│   │       ├── 📄 simulator.py     Payoff calculator
-│   │       ├── 📄 leaderboard.py   User rankings
-│   │       └── 📄 charts.py        Analytics data
-│   ├── 📄 main.py                  App entry point
-│   └── 📄 requirements.txt         Python dependencies
+├── BACKEND/                    FastAPI Backend
+│   ├── app/
+│   │   ├── auth.py             JWT + password hashing
+│   │   ├── database.py         DB connection + session
+│   │   ├── models.py           SQLAlchemy models
+│   │   ├── schemas.py          Pydantic schemas
+│   │   └── routes/
+│   │       ├── auth.py         Authentication
+│   │       ├── cards.py        Credit card CRUD
+│   │       ├── payments.py     Payment logging
+│   │       ├── dashboard.py    Dashboard summary
+│   │       ├── badges.py       Achievements
+│   │       ├── simulator.py    Payoff calculator
+│   │       ├── leaderboard.py  User rankings
+│   │       └── charts.py       Analytics
+│   ├── main.py                 App entry point
+│   └── requirements.txt        Python dependencies
 │
-├── 📁 FRONTEND/                    React + TypeScript Frontend
-│   ├── 📁 src/
-│   │   ├── 📁 components/
-│   │   │   ├── 📄 CardFormModal.tsx
-│   │   │   ├── 📄 CreditCardVisual.tsx
-│   │   │   ├── 📄 Layout.tsx
-│   │   │   ├── 📄 LogPaymentModal.tsx
-│   │   │   └── 📄 PrivateRoute.tsx
-│   │   ├── 📁 context/
-│   │   │   └── 📄 AuthContext.tsx
-│   │   ├── 📁 pages/
-│   │   │   ├── 📄 Landing.tsx
-│   │   │   ├── 📄 Login.tsx
-│   │   │   ├── 📄 Register.tsx
-│   │   │   ├── 📄 Dashboard.tsx
-│   │   │   ├── 📄 Cards.tsx
-│   │   │   ├── 📄 Payments.tsx
-│   │   │   ├── 📄 Charts.tsx
-│   │   │   ├── 📄 Badges.tsx
-│   │   │   ├── 📄 Simulator.tsx
-│   │   │   ├── 📄 Leaderboard.tsx
-│   │   │   └── 📄 Profile.tsx
-│   │   ├── 📁 types/
-│   │   │   └── 📄 types.ts
-│   │   ├── 📁 utils/
-│   │   │   └── 📄 api.ts           Axios config
-│   │   ├── 📄 App.tsx
-│   │   └── 📄 main.tsx
-│   ├── 📄 package.json
-│   └── 📄 vercel.json              SPA routing config
+├── FRONTEND/                   React + TypeScript
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── CardFormModal.tsx
+│   │   │   ├── CreditCardVisual.tsx
+│   │   │   ├── Layout.tsx
+│   │   │   ├── LogPaymentModal.tsx
+│   │   │   └── PrivateRoute.tsx
+│   │   ├── context/
+│   │   │   └── AuthContext.tsx
+│   │   ├── pages/
+│   │   │   ├── Landing.tsx
+│   │   │   ├── Login.tsx
+│   │   │   ├── Register.tsx
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── Cards.tsx
+│   │   │   ├── Payments.tsx
+│   │   │   ├── Charts.tsx
+│   │   │   ├── Badges.tsx
+│   │   │   ├── Simulator.tsx
+│   │   │   ├── Leaderboard.tsx
+│   │   │   └── Profile.tsx
+│   │   ├── types/
+│   │   │   └── types.ts
+│   │   ├── utils/
+│   │   │   └── api.ts
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   ├── package.json
+│   └── vercel.json
 │
-└── 📄 README.md
+└── README.md
+```
